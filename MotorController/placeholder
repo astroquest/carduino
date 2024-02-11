@@ -1,6 +1,6 @@
 /* 
-  Converts encoder readings to counts 
-  and sends counts over serial communication when asked.
+Converts encoder readings to counts 
+and sends counts over serial communication when asked.
 */ 
 
 #include <Encoder.h>
@@ -34,10 +34,8 @@ void updateCount(long count, long prev_count) {
 
 void sendCountsOnRequest(long count_left, long count_right) {
   if (Serial.available() > 0 && Serial.read() == '0') {
-      Serial.write("<");
       writeMessage(count_left);
       writeMessage(count_right);
-      Serial.write(">");
       Serial.write("\n");
   }
 }

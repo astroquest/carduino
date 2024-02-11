@@ -1,76 +1,137 @@
-/*
-Controls motors using RPM from encoder interface 
-and PID to set the duty cycle in closed-loop
-*/
-
 #include "PinConfig.h"
 #include "ParamConfig.h"
+#include <SoftwareSerial.h>
 
-#include <Pid.h>
-#include <EncoderInterfaceComm.h>
+SoftwareSerial bluetooth(9, 8); // BT(TX, RX)
 
-// instantiations
-Pid pid_left(cycle_time, kp, ki, kd, taud, limit_min, limit_max);
-Pid pid_right(cycle_time, kp, ki, kd, taud, limit_min, limit_max);
+enum class Status {
+  FORWARD,
+  BACKWARD,
+  LEFT,
+  RIGHT,
+  STOP,
+  CHECK_VOLTAGE,
+  INVALID
+};
 
-EncoderInterfaceComm eicomm_left(Serial1, cycle_time, n_pulses, gear_ratio, wheel_radius);
-EncoderInterfaceComm eicomm_right(Serial1, cycle_time, n_pulses, gear_ratio, wheel_radius);
-
-void setup() {
-  Serial.begin(9600);
-  Serial1.begin(9600);
-
-  pinMode(pwm_left, OUTPUT);
-  pinMode(pwm_right, OUTPUT);
-  pinMode(in_left_1, OUTPUT);
-  pinMode(in_left_2, OUTPUT);
-  pinMode(in_right_1, OUTPUT);
-  pinMode(in_right_2, OUTPUT);
-
-  digitalWrite(in_left_1, LOW);
-  digitalWrite(in_left_2, HIGH);
-  digitalWrite(in_right_1, LOW);
-  digitalWrite(in_right_2, HIGH);
+Status messageToStatus(char* message) {
+  if (strcmp(message, "forward") == 0) {
+    return Status::FORWARD;
+  }
+  else if (strcmp(message, "backward") == 0) {
+    return Status::BACKWARD;
+  }
+  else if (strcmp(message, "left") == 0) {
+    return Status::LEFT;
+  }
+  else if (strcmp(message, "right") == 0) {
+    return Status::RIGHT;
+  }
+  else if (strcmp(message, "stop") == 0) {
+    return Status::STOP;
+  }
+  else if (strcmp(message, "voltage") == 0) {
+    return Status::CHECK_VOLTAGE;
+  }
+  else return Status::INVALID;
 }
 
-double setpoint_left = 0;
-double setpoint_right = 0;
-double rpm_left = 0;
-double rpm_right = 0;
+void setup() {
+  bluetooth.begin(9600);
 
-double prev_duty_cycle_left = 0;
-double prev_duty_cycle_right = 0;
+  for (int i = 0; i < 2; i++) {
+    pinMode(pwm_pins[i], OUTPUT);
+  }
+
+  for (int i = 0; i < 4; i++) {
+    pinMode(enable_pins[i], OUTPUT);
+  }
+
+  digitalWrite(enable_pins[0], LOW);
+  digitalWrite(enable_pins[1], HIGH);
+  digitalWrite(enable_pins[2], LOW);
+  digitalWrite(enable_pins[3], HIGH);
+}
+
+double duty_cycle[2] = {0, 0};
+Status direction;
 
 void loop() {
-  rpm_left = eicomm_left.getRpm();
-  rpm_right = eicomm_left.getRpm();
+  byte i = 0;
+  char buffer[num_chars];
+  bool done = false;
 
-  setPwm(pid_left, pwm_left, in_left_1, in_left_2, setpoint_left, rpm_left, prev_duty_cycle_left); // don't like having the prev duty cycle here, improve these functions
-  setPwm(pid_right, pwm_right, in_right_1, in_right_2, setpoint_right, rpm_right, prev_duty_cycle_right); // not only setting the PWM but also direction, so function name is bad
+  while (bluetooth.available()) {
+    char x = bluetooth.read();
 
+    if (x == '!') {
+      buffer[i] = '\0';
+
+      Status status = messageToStatus(buffer);
+
+      if (status == Status::FORWARD) {
+        if (direction == Status::BACKWARD) {
+          setMotorsForward();
+        }
+
+        duty_cycle[0] = 120;
+        duty_cycle[1] = 100;
+      }
+      else if (status == Status::BACKWARD) {
+        if (direction == Status::FORWARD) {
+          setMotorsBackward();
+        }
+
+        duty_cycle[0] = 80;
+        duty_cycle[1] = 70;
+      }
+      else if (status == Status::LEFT) {
+        duty_cycle[0] = 80;
+        duty_cycle[1] = 140;
+      }
+      else if (status == Status::RIGHT) {
+        duty_cycle[0] = 140;
+        duty_cycle[1] = 80;
+      }
+      else if (status == Status::STOP) {
+        duty_cycle[0] = 0;
+        duty_cycle[1] = 0;
+      }
+      else if (status == Status::CHECK_VOLTAGE) {
+        // check battery voltage
+      }
+
+      i = 0;
+      done = true;
+    } 
+    else if (done == false){
+      buffer[i] = x;
+
+      i++;
+    }
+  }
+
+  for (int i = 0; i < 2; i++) {
+    analogWrite(pwm_pins[i], duty_cycle[i]);
+  }
+  
   delay(cycle_time);
 }
 
-void setPwm(Pid pid, PwmPin pwm, DigPin in_1, DigPin in_2, double setpoint, double rpm, double prev_duty_cycle) {
-  double duty_cycle = pid.getAction(setpoint, rpm);
+void setMotorsForward() {
+  digitalWrite(enable_pins[0], LOW);
+  digitalWrite(enable_pins[1], HIGH);
+  digitalWrite(enable_pins[2], LOW);
+  digitalWrite(enable_pins[3], HIGH);
 
-  if (duty_cycle * prev_duty_cycle < 0) {
-    switchDirection(in_1, in_2, duty_cycle);
-  }
-
-  prev_duty_cycle = duty_cycle;
-
-  return analogWrite(pwm, round(abs(duty_cycle)*255));
+  direction = Status::FORWARD;
 }
 
-void switchDirection(DigPin in_1, DigPin in_2, double duty_cycle) {
-  if (duty_cycle < 0) {
-    digitalWrite(in_1, HIGH);
-    digitalWrite(in_2, LOW);
-  }
-  else {
-    digitalWrite(in_1, LOW);
-    digitalWrite(in_2, HIGH);
-  }
+void setMotorsBackward() {
+  digitalWrite(enable_pins[0], HIGH);
+  digitalWrite(enable_pins[1], LOW);
+  digitalWrite(enable_pins[2], HIGH);
+  digitalWrite(enable_pins[3], LOW);
 
+  direction = Status::BACKWARD;
 }

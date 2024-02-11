@@ -1,19 +1,21 @@
 /*
-definition of pinouts based on the MEGA microcontrollers
+definition of pinouts
 */
 
-#ifndef CONFIGMEGA_H
-#define CONFIGMEGA_H
+#ifndef PINCONFIG_H
+#define PINCONFIG_H
 
-typedef const int DigPin;
-typedef const int PwmPin;
+typedef const int EnablePin;
+typedef const int PWMPin;
 
-PwmPin pwm_left = 5;
-PwmPin pwm_right = 8;
+PWMPin pwm_left = 5;
+PWMPin pwm_right = 3;
+EnablePin en_left_1 = 7;
+EnablePin en_left_2 = 6;
+EnablePin en_right_1 = 11;
+EnablePin en_right_2 = 10;
 
-DigPin in_left_1 = 6;
-DigPin in_left_2 = 7;
-DigPin in_right_1 = 9;
-DigPin in_right_2 = 10;
+PWMPin pwm_pins[2] = {pwm_left, pwm_right};
+EnablePin enable_pins[4] = {en_left_1, en_left_2, en_right_1, en_right_2};
 
 #endif
