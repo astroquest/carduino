@@ -20,4 +20,4 @@ const double limit_min = -0.1;
 const double limit_max = 0.1;
 
 // bluetooth message settings
-const byte num_chars = 128;
+static const byte num_chars = 128;
