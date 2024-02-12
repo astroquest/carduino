@@ -1,48 +1,37 @@
 /* 
   Converts encoder readings to counts 
-  and sends counts over serial communication when asked.
+  and sends counts over serial communication when prompted.
 */ 
 
 #include <Encoder.h>
 
-Encoder encoder_left(2, 4);  // 2 and 3 are external interrupt pins on the arduino uno
-Encoder encoder_right(3, 5);
+Encoder encoders[2] {
+  Encoder(2, 12), // 2 and 3 are external interrupt pins on the arduino uno
+  Encoder(3, 11)
+};
 
 void setup() {
   Serial.begin(9600);
+
+  // pinMode(6, INPUT);
 }
 
-long prev_count_left = -999;
-long prev_count_right = -999;
-char buffer[12];
+long counts[2] {0, 0};
 
 void loop() {
-  long count_left = encoder_left.read();
-  long count_right = encoder_right.read();
+  for (int i = 0; i < 2; i++) {
+    counts[i] = encoders[i].read();
+  }
 
-  updateCount(count_left, prev_count_left);
-  updateCount(count_right, prev_count_right);
-
-  sendCountsOnRequest(count_left, count_right);
+  sendCountsOnRequest(counts);
 }
 
-void updateCount(long count, long prev_count) {
-  if (count != prev_count) {
-    prev_count = count;
-  }  
-}
-
-void sendCountsOnRequest(long count_left, long count_right) {
+void sendCountsOnRequest(long *counts) {
   if (Serial.available() > 0 && Serial.read() == '0') {
-      Serial.write("<");
-      writeMessage(count_left);
-      writeMessage(count_right);
-      Serial.write(">");
+      Serial.print(counts[0]);
+      Serial.write(',');
+      Serial.print(counts[1]);
+      Serial.write("!");
       Serial.write("\n");
   }
-}
-
-void writeMessage(long count) {
-  Serial.write(ltoa(count, buffer, 10));
-  Serial.write(",");  
 }

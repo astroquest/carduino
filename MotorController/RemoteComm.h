@@ -6,11 +6,11 @@
 #define REMOTECOMM_H
 
 #include <Arduino.h>
-#include <HardwareSerial.h>
+#include <SoftwareSerial.h>
 
 class RemoteComm { // put this in a parent class
     public:
-        RemoteComm(HardwareSerial &port);
+        RemoteComm(SoftwareSerial &port);
 
         void monitor();
 
@@ -18,7 +18,7 @@ class RemoteComm { // put this in a parent class
         char message[num_chars];
 
     private:
-        HardwareSerial &port;
+        SoftwareSerial &port;
 };
 
 

@@ -1,6 +1,6 @@
 #include "RemoteComm.h"
 
-RemoteComm::RemoteComm(HardwareSerial &port) : port(port) {}
+RemoteComm::RemoteComm(SoftwareSerial &port) : port(port) {}
 
 void RemoteComm::monitor() {
     byte i = 0;

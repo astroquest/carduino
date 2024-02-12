@@ -19,6 +19,8 @@ void EncoderComm::init(int n_pulses, double gear_ratio) {
 }
 
 void EncoderComm::monitor() {
+    port.write('0');  // ask encoder interface to send updated counts
+
     byte i = 0;
     char buffer[num_chars];
     bool done = false;
@@ -42,16 +44,14 @@ void EncoderComm::monitor() {
         }
     }
 
-    if (done) {
+    if (done) {. // refactor this
         char* ptr_token;
         ptr_token = strtok(message, ",");
 
         count[0] = atol(ptr_token);
-        // port.println(count[0]);
 
         ptr_token = strtok(NULL, ",");
         count[1] = atol(ptr_token);
-        // port.println(count[1]);
 
         rpm[0] = computeRPM(count[0], prev_count[0]);
         prev_count[0] = count[0];
