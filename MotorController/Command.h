@@ -1,11 +1,11 @@
-#ifndef STATUS_H
-#define STATUS_H
+#ifndef COMMAND_H
+#define COMMAND_H
 
 /*
-    Enum and associated string definitions of recognized statuses
+    Enum and associated string definitions of recognized Commands
 */
 
-enum class Status {
+enum class Command {
     FORWARD,
     REVERSE,
     LEFT,
@@ -15,26 +15,26 @@ enum class Status {
     INVALID
 };
 
-Status messageToStatus(char* message) {
+Command messageToCommand(char* message) {
     if (strcmp(message, "forward") == 0) {
-        return Status::FORWARD;
+        return Command::FORWARD;
     }
     else if (strcmp(message, "reverse") == 0) {
-        return Status::REVERSE;
+        return Command::REVERSE;
     }
     else if (strcmp(message, "left") == 0) {
-        return Status::LEFT;
+        return Command::LEFT;
     }
     else if (strcmp(message, "right") == 0) {
-        return Status::RIGHT;
+        return Command::RIGHT;
     }
     else if (strcmp(message, "stop") == 0) {
-        return Status::STOP;
+        return Command::STOP;
     }
     else if (strcmp(message, "voltage") == 0) {
-        return Status::CHECK_VOLTAGE;
+        return Command::CHECK_VOLTAGE;
     }
-    else return Status::INVALID;
+    else return Command::INVALID;
 }
 
 #endif

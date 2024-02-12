@@ -16,8 +16,8 @@ const double kp = 0.01;
 const double ki = 0.01;
 const double kd = 0;
 const double taud = 0;
-const double limit_min = -0.1;
-const double limit_max = 0.1;
+const double limit_min = 0;
+const double limit_max = 0.3;
 
 // bluetooth message settings
 static const byte num_chars = 128;
