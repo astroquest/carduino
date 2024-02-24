@@ -1,23 +1,34 @@
 #ifndef PID_H
 #define PID_H
 
+/*
+    Implements a tamed PID controller with integral clamping
+*/
+
+struct PIDParams {
+    double kp;
+    double ki;
+    double kd;
+    double tau;
+    double limit_max;
+    double limit_min;
+};
+
 class PID {
     public:
-        PID(double, double, double, double, double, double, double);
+        PID(double, PIDParams);
 
         void setGains(double, double, double, double);
         void setLimits(double, double);
-        void resetController();
-
         double getAction(double, double);
 
         double kp;
         double ki;
         double kd;
-        double taud;
+        double tau;
 
     private:
-        void setCoefficients();
+        void init();
 
         double getIntegralAction(double);
         double getDerivativeAction(double);

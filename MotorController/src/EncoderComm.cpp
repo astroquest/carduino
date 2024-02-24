@@ -1,4 +1,4 @@
-#include "EncoderComm.h"
+#include "../lib/EncoderComm.h"
 
 EncoderComm::EncoderComm(
         HardwareSerial &port,
@@ -44,7 +44,7 @@ void EncoderComm::monitor() {
         }
     }
 
-    if (done) {. // refactor this
+    if (done) { // refactor this
         char* ptr_token;
         ptr_token = strtok(message, ",");
 

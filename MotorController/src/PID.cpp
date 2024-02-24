@@ -1,49 +1,37 @@
-#include "PID.h"
+#include "../lib/PID.h"
 
-PID::PID(
-        double cycle_time_ms, 
-        double kp, 
-        double ki, 
-        double kd, 
-        double taud_ms, 
-        double limit_min, 
-        double limit_max
-    ) 
-    : cycle_time(cycle_time_ms / 1000), limit_min(limit_min), limit_max(limit_max) {
+PID::PID(double cycle_time, PIDParams pid_params) : cycle_time(cycle_time) {
+    init();
 
-    setGains(kp, ki, kd, taud_ms);
-    setLimits(limit_min, limit_max);
-    setCoefficients();
-    resetController();
+    setGains(pid_params.kp, pid_params.ki, pid_params.kd, pid_params.tau);
+    setLimits(pid_params.limit_min, pid_params.limit_max);
 }
 
-void PID::setGains(double kp, double ki, double kd, double taud_ms) {
-    this->kp = kp;
-    this->ki = ki;
-    this->kd = kd;
-    this->taud = taud_ms / 1000;
-}
-
-void PID::setLimits(double limit_min, double limit_max) {
-    this->limit_min = limit_min;
-    this->limit_max = limit_max;
-}
-
-void PID::resetController() {
+void PID::init() {
     prev_process_output = 0;
     prev_error = 0;
     prev_integral_action = 0;
     prev_derivative_action = 0;
 }
 
-void PID::setCoefficients() {
+void PID::setGains(double kp, double ki, double kd, double tau) {
+    this->kp = kp;
+    this->ki = ki;
+    this->kd = kd;
+    this->tau = tau;
+
     b_int = ki * cycle_time / 2;
 
-    double s1 = 2 * taud;
+    double s1 = 2 * tau;
     double s2 = 1 / (s1 + cycle_time);
 
     a_der = (s1 - cycle_time) * s2;
     b_der = - 2 * kd * s2;
+}
+
+void PID::setLimits(double limit_min, double limit_max) {
+    this->limit_min = limit_min;
+    this->limit_max = limit_max;
 }
 
 double PID::getAction(double setpoint, double process_output) {

@@ -1,21 +1,21 @@
 #include <SoftwareSerial.h>
 
-#include "PinConfig.h"
-#include "ParamConfig.h"
-#include "Command.h"
-#include "Status.h"
+#include "lib/RemoteComm.h"
+#include "lib/EncoderComm.h"
+#include "lib/PID.h"
 
-#include "RemoteComm.h"
-#include "EncoderComm.h"
-#include "PID.h"
+#include "lib/PinConfig.h"
+#include "lib/ParamConfig.h"
+#include "lib/Command.h"
+#include "lib/Status.h"
 
 SoftwareSerial bluetooth(9, 8); // BT(TX, RX)
 
 RemoteComm remote_comm(bluetooth);
 EncoderComm encoder_comm(Serial, cycle_time, n_pulses, gear_ratio);
 PID pid[2] = {
-  PID(cycle_time, kp, ki, kd, taud, limit_min, limit_max), 
-  PID(cycle_time, kp, ki, kd, taud, limit_min, limit_max)
+  PID(cycle_time, pid_params), 
+  PID(cycle_time, pid_params)
 }; // one PID for each motor
 
 void setup() {

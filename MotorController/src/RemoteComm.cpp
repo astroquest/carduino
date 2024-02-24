@@ -1,4 +1,4 @@
-#include "RemoteComm.h"
+#include "../lib/RemoteComm.h"
 
 RemoteComm::RemoteComm(SoftwareSerial &port) : port(port) {}
 
