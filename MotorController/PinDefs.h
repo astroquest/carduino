@@ -5,17 +5,19 @@
 #ifndef PINDEFS_H
 #define PINDEFS_H
 
-typedef const int EnablePin;
-typedef const int PWMPin;
+typedef const int Pin;
 
-PWMPin pwm_left = 5;
-PWMPin pwm_right = 3;
-EnablePin en_left_1 = 7;
-EnablePin en_left_2 = 6;
-EnablePin en_right_1 = 11;
-EnablePin en_right_2 = 10;
+Pin pwm_left = 5;
+Pin pwm_right = 3;
+Pin en_left_1 = 7;
+Pin en_left_2 = 6;
+Pin en_right_1 = 11;
+Pin en_right_2 = 10;
+Pin tx = 9;
+Pin rx = 8;
 
-PWMPin pwm_pins[2] = {pwm_left, pwm_right};
-EnablePin enable_pins[4] = {en_left_1, en_left_2, en_right_1, en_right_2};
+
+Pin pwm_pins[2] = {pwm_left, pwm_right};
+Pin enable_pins[4] = {en_left_1, en_left_2, en_right_1, en_right_2};
 
 #endif

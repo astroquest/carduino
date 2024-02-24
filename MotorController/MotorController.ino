@@ -9,13 +9,13 @@
 #include "lib/Command.h"
 #include "lib/Status.h"
 
-SoftwareSerial bluetooth(9, 8); // BT(TX, RX)
+SoftwareSerial bluetooth(tx, rx); // BT(TX, RX)
 
 RemoteComm remote_comm(bluetooth);
-EncoderComm encoder_comm(Serial, cycle_time, n_pulses, gear_ratio);
-PID pid[2] = {
-  PID(cycle_time, pid_params), 
-  PID(cycle_time, pid_params)
+EncoderComm encoder_comm(Serial, sampling_time_ms, n_pulses, gear_ratio);
+PID pids[2] = {
+  PID(sampling_time, pid_params), 
+  PID(sampling_time, pid_params)
 }; // one PID for each motor
 
 void setup() {
@@ -55,7 +55,7 @@ void loop() {
   encoder_comm.monitor();
 
   for (int i = 0; i < 2; i++) {
-    duty_cycle[i] = pid[i].getAction(rpm_setpoint[i], encoder_comm.rpm[i]);
+    duty_cycle[i] = pids[i].getAction(rpm_setpoint[i], encoder_comm.rpm[i]);
     int duty_cycle_analog = abs(round(duty_cycle[i] * 255));
 
     if (rpm_setpoint[i] == 0.0) { // fix this case
@@ -66,7 +66,7 @@ void loop() {
     }
   }
 
-  delay(cycle_time);
+  delay(sampling_time_ms);
 }
 
 void setRPMSetpoint(char *remote_message) { // overloaded function, bad name
