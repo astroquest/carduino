@@ -38,7 +38,7 @@ void EncoderComm::monitor() {
         else if (!done) {
             buffer[i] = x;
 
-            i++;
+            ++i;
 
             message[0] = '\0';
         }

@@ -4,8 +4,8 @@
 #include "lib/EncoderComm.h"
 #include "lib/PID.h"
 
-#include "lib/PinConfig.h"
-#include "lib/ParamConfig.h"
+#include "PinDefs.h"
+#include "Settings.h"
 #include "lib/Command.h"
 #include "lib/Status.h"
 

@@ -2,6 +2,9 @@
 parameter definitions
 */
 
+#ifndef SETTINGS_H
+#define SETTINGS_H
+
 const int n_motors = 2;
 
 const double cycle_time = 0.1;
@@ -25,3 +28,5 @@ PIDParams pid_params {kp, ki, kd, tau, limit_min, limit_max};
 
 // bluetooth message settings
 static const byte num_chars = 128;
+
+#endif

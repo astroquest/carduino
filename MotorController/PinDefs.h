@@ -1,9 +1,9 @@
 /*
-definition of pinouts
+    definition of pinouts
 */
 
-#ifndef PINCONFIG_H
-#define PINCONFIG_H
+#ifndef PINDEFS_H
+#define PINDEFS_H
 
 typedef const int EnablePin;
 typedef const int PWMPin;
